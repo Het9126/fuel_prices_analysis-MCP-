@@ -1,6 +1,6 @@
 import os
 import dotenv
-from mcp_bakery_app import tools
+from fuel_price_app import tools
 from google.adk.agents import LlmAgent
 
 dotenv.load_dotenv()
@@ -12,7 +12,7 @@ bigquery_toolset = tools.get_bigquery_mcp_toolset()
 
 root_agent = LlmAgent(
     model='gemini-3.1-pro-preview',
-    name='root_agent',
+    name='fuel_price_agent',
     instruction=f"""
                 Help the user answer questions about global fuel prices (Petrol, Diesel, LPG) by strategically combining insights from two sources:
                 
