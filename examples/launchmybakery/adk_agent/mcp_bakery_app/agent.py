@@ -14,12 +14,15 @@ root_agent = LlmAgent(
     model='gemini-3.1-pro-preview',
     name='root_agent',
     instruction=f"""
-                Help the user answer questions by strategically combining insights from two sources:
+                Help the user answer questions about global fuel prices (Petrol, Diesel, LPG) by strategically combining insights from two sources:
                 
-                1.  **BigQuery toolset:** Access demographic (inc. foot traffic index), product pricing, and historical sales data in the  mcp_bakery dataset. Do not use any other dataset.
-                Run all query jobs from project id: {PROJECT_ID}. 
+                1.  **BigQuery toolset:** Access fuel price data in the 'fuel_prices_analysis' dataset. 
+                    - Table 'petrol_prices': Global petrol prices with consumption and world share.
+                    - Table 'diesel_prices': Historical diesel prices (monthly) for various countries.
+                    - Table 'lpg_prices': Historical LPG prices (monthly) for various countries.
+                    Run all query jobs from project id: {PROJECT_ID}. 
 
-                2.  **Maps Toolset:** Use this for real-world location analysis, finding competition/places and calculating necessary travel routes.
+                2.  **Maps Toolset:** Use this for real-world location analysis, finding gas stations, or calculating routes related to fuel logistics.
                     Include a hyperlink to an interactive map in your response where appropriate.
             """,
     tools=[maps_toolset, bigquery_toolset]

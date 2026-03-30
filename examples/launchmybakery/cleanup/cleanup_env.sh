@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # ==========================================
-# MCP Bakery Demo - Complete Cleanup Script
+# Fuel Price Analysis - Cleanup Script
 # ==========================================
 
 # 1. Configuration & Project Detection
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ENV_FILE="$SCRIPT_DIR/../adk_agent/mcp_bakery_app/.env"
-DATASET_NAME="mcp_bakery"
+ENV_FILE="$SCRIPT_DIR/../.env"
+DATASET_NAME="fuel_prices_analysis"
 
-# Attempt to load Project ID from local .env if available (supports multi-session/cloud shell)
+# Attempt to load Project ID from local .env if available
 if [ -f "$ENV_FILE" ]; then
     PROJECT_ID=$(grep -E "^GOOGLE_CLOUD_PROJECT=" "$ENV_FILE" | cut -d'=' -f2)
 fi
@@ -23,9 +23,9 @@ if [ -z "$PROJECT_ID" ]; then
     exit 1
 fi
 
-# Determine bucket name (Default or Argument)
+# Determine bucket name (Match setup_bigquery.sh default)
 if [ -z "$1" ]; then
-    BUCKET_NAME="gs://mcp-bakery-data-$PROJECT_ID"
+    BUCKET_NAME="gs://fuel-data-storage-$PROJECT_ID"
 else
     BUCKET_NAME=$1
 fi
@@ -37,7 +37,7 @@ echo "Project:   $PROJECT_ID"
 echo "Dataset:   $DATASET_NAME"
 echo "Bucket:    $BUCKET_NAME"
 echo "Local Env: $ENV_FILE"
-echo "API Keys:  Keys named 'bakery-demo-key-*'"
+echo "API Keys:  Keys named 'fuel-demo-key-*'"
 echo "----------------------------------------------------------------"
 echo "WARNING: This will permanently delete the dataset, bucket, and API keys."
 read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
@@ -74,7 +74,7 @@ fi
 echo "[3/5] Cleaning up API Keys..."
 # Find keys matching the demo pattern
 KEYS_TO_DELETE=$(gcloud alpha services api-keys list \
-    --filter="displayName:bakery-demo-key-*" \
+    --filter="displayName:fuel-demo-key-*" \
     --format="value(name)" 2>/dev/null)
 
 if [ -z "$KEYS_TO_DELETE" ]; then
@@ -103,7 +103,7 @@ fi
 # ------------------------------------------
 echo "[5/5] Checking Enabled APIs..."
 echo "----------------------------------------------------------------"
-echo "The setup enabled: mapstools, apikeys, bigquery."
+echo "The setup enabled: aiplatform, apikeys, bigquery, maps-backend."
 echo "NOTE: Only disable these if no other apps in this project use them."
 echo ""
 read -p "Do you want to disable these APIs? (y/n) " -n 1 -r
@@ -111,9 +111,10 @@ echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Disabling APIs (this may take a moment)..."
-    gcloud services disable mapstools.googleapis.com --project=$PROJECT_ID --force
+    gcloud services disable maps-backend.googleapis.com --project=$PROJECT_ID --force
     gcloud services disable bigquery.googleapis.com --project=$PROJECT_ID --force
     gcloud services disable apikeys.googleapis.com --project=$PROJECT_ID --force
+    gcloud services disable aiplatform.googleapis.com --project=$PROJECT_ID --force
     echo "APIs disabled."
 else
     echo "Skipping API disablement."
