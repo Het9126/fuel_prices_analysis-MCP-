@@ -1,3 +1,7 @@
+google-adk==1.28.0
+python-dotenv
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
 pandas
-numpy
-google-cloud-bigquery
+db-dtypes
